@@ -18,8 +18,9 @@ class AuthServices {
                             { expiresIn: '5d' }
                         ) : null;
             resolve({
-                err: response[1] ? 0 : 1,
-                mes: response[1] ? 'Register is successfully' : 'Email is used'
+                err: token ? 0 : 1,
+                mes: token ? 'Register is successfully' : response ? 'Password is wrong' : 'Email is wrong',
+                'access_token': `Beaser ${token}`
             });
     
             resolve({
@@ -35,9 +36,15 @@ class AuthServices {
         try {
             const response = await db.User.findOne({
                 where: { email: email },
-                // raw: true
+                // raw: true // tra ve mot object
             });
-            console.log('response', response);
+            let isChecked = response && bcrypt.compareSync(password, response.dataValues.password);
+            const token = isChecked ? 
+                        jwt.sign(
+                            {id: response.id, email: response.email}, 
+                            process.env.JWT_SECRET, 
+                            { expiresIn: '5d' }
+                        ) : null;
             // const token = response[1] ? jwt.sign(
             //                 {id: response[0].id, email: response[0].email}, 
             //                 process.env.JWT_SECRET, 
@@ -45,7 +52,8 @@ class AuthServices {
             //             ) : null;
             resolve({
                 err: response ? 0 : 1,
-                mes: response ? 'Login is successfully' : 'Error'
+                mes: response ? 'Login is successfully' : 'Error',
+                'access_token': `Beaser ${token}`
             });
     
             resolve({

@@ -1,4 +1,5 @@
 import  authServices from "../../services/AuthServices";
+import { internalServerError } from "../middlewares/HanddleErrors"
 import user from "../../models/user";
 
 class AuthController {
@@ -9,16 +10,11 @@ class AuthController {
                 err: 1,
                 mes: 'email or password is required'
             })
-            // console.log(req.body);
             const response = await authServices.register(req.body);
-            // console.log('aa', userResult);
+
             return res.status(200).json(response);
         } catch (error) {
-            console.log(error);
-            return res.status(500).json({
-                err: -1,
-                mes: 'Iternal Server Error'
-            })
+            return internalServerError(res);
         }
     };
 
@@ -33,11 +29,7 @@ class AuthController {
 
             return res.status(200).json(response);
         } catch (error) {
-            console.log(error);
-            return res.status(500).json({
-                err: -1,
-                mes: 'Iternal Server Error'
-            })
+            return internalServerError(res);
         }
     };
 }
